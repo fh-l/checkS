@@ -1,26 +1,30 @@
 import json
 import uuid
-from django.shortcuts import render
+import logging
 from django.http import HttpResponse, JsonResponse
-from rest_framework import status
-from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .models import Cloud, Datanode, Alarm
 from .serializers import CloudSerializer, DatanodeSerializer, AlarmSerializer, RecoverSerializer
 
+logger = logging.getLogger(__name__)
+
+
 def check_headers(headers):
-    common = ['version', 'date', 'signature', 'storagekeyid']
+    common = ['HTTP_VERSION', 'HTTP_DATE', 'HTTP_SIGNATURE', 'HTTP_STORAGEKEYID']
     for key in common:
         if key not in headers:
             return False
     else:
         return True
 
+
 def index(request):
     return HttpResponse('Hello World!')
 
+
 @api_view(['POST'])
 def cloud_add(request):
+    logger.info(request.META)
     serializer = CloudSerializer(data=request.data)
     if serializer.is_valid():
         cloudid = uuid.uuid1()
@@ -28,19 +32,25 @@ def cloud_add(request):
         return JsonResponse({'code': "200", "cloudid": cloudid}, status=200)
     return JsonResponse({"code": "1", "message": serializer.errors}, status=400)
 
+
 def cloud_delete(request, cloudid):
-    if request.method == 'DELETE':
-        try:
-            cloud = Cloud.objects.get(cloudid=cloudid)
-            cloud.delete()
-            res = {"code":"200"}
-            return JsonResponse(res, status=200)
-        except Cloud.DoesNotExist:
-            res = {"code": "500", "message": "object not found"}
+    if check_headers(headers=request.META):
+        if request.method == 'DELETE':
+            try:
+                cloud = Cloud.objects.get(cloudid=cloudid)
+                cloud.delete()
+                res = {"code": "200"}
+                return JsonResponse(res, status=200)
+            except Cloud.DoesNotExist:
+                res = {"code": "500", "message": "object not found"}
+                return JsonResponse(res, status=400)
+        else:
+            res = {"code": "500", "message": "method not supported"}
             return JsonResponse(res, status=400)
     else:
-        res = {"code": "500", "message": "method not supported"}
+        res = {"code": "500", "message": "public header not contained"}
         return JsonResponse(res, status=400)
+
 
 @api_view(['POST'])
 def datanode_add(request):
@@ -59,18 +69,23 @@ def datanode_add(request):
 
 
 def datanode_delete(request, cloudid, dataunitid):
-    if request.method == 'DELETE':
-        try:
-            dataunit = Datanode.objects.get(cloudid=cloudid, dataunitid=dataunitid)
-            dataunit.delete()
-            res = {"code":"200"}
-            return JsonResponse(res, status=200)
-        except Datanode.DoesNotExist:
-            res = {"code": "500", "message": "object not found"}
+    if check_headers(headers=request.META):
+        if request.method == 'DELETE':
+            try:
+                dataunit = Datanode.objects.get(cloudid=cloudid, dataunitid=dataunitid)
+                dataunit.delete()
+                res = {"code": "200"}
+                return JsonResponse(res, status=200)
+            except Datanode.DoesNotExist:
+                res = {"code": "500", "message": "object not found"}
+                return JsonResponse(res, status=400)
+        else:
+            res = {"code": "500", "message": "method not supported"}
             return JsonResponse(res, status=400)
     else:
-        res = {"code": "500", "message": "method not supported"}
+        res = {"code": "500", "message": "public header not contained"}
         return JsonResponse(res, status=400)
+
 
 @api_view(['POST'])
 def alarm_add(request):

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import logging.config
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -68,6 +69,13 @@ TEMPLATES = [
         },
     },
 ]
+# disable rest-framework html view
+# https://stackoverflow.com/questions/11898065/how-to-disable-admin-style-browsable-interface-of-django-rest-framework
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    )
+}
 
 WSGI_APPLICATION = 'checkS.wsgi.application'
 
@@ -100,6 +108,45 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+LOGGING_CONFIG = None
+logging.config.dictConfig({
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'console': {
+            'format': '%(asctime)s %(name)s %(levelname)s %(message)s',
+        },
+        'file': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        }
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'console'
+        },
+        'gfile': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': 'ges.log',
+            'maxBytes': 1024*1024*10,
+            'backupCount': 5,
+            'formatter': 'file',
+        }
+    },
+    'loggers': {
+        '': {
+            'level': 'INFO',
+            'handlers': ['console'],
+        },
+        'ges': {
+            'level': 'INFO',
+            'handlers': ['gfile'],
+            'propagate': False
+        }
+    }
+})
 
 
 # Internationalization
