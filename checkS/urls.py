@@ -18,5 +18,5 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('ges.urls'))
+    path('cloudapi/', include('ges.urls'))
 ]
