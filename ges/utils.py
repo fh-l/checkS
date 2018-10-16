@@ -1,12 +1,5 @@
 #!/usr/bin/env python
 # encoding: utf-8
-'''
-@author: yao.qiang
-@contact: yao.qiang@sihuatech.com
-@file: utils.py
-@time: 2018/9/21 17:17
-@desc:
-'''
 from __future__ import print_function
 from hashlib import sha1
 import hmac

@@ -8,7 +8,7 @@ from .models import Cloud, Datanode, Alarm
 from .serializers import CloudSerializer, DatanodeSerializer, AlarmSerializer, RecoverSerializer
 
 logger = logging.getLogger(__name__)
-key = '123'
+key = '123456'
 
 
 def check_headers(headers):
