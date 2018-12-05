@@ -26,17 +26,20 @@ def getdataunitnum(request, manufacturer):
 
 @api_view(['POST'])
 def cloud_add(request):
-    logger.info(request.body)
-    serializer = CloudSerializer(data=request.data)
-    if serializer.is_valid():
-        logger.info(serializer.validated_data)
-        if serializer.is_valid():
-            Cloud.objects.create(cloudname=serializer.validated_data['cloudname'],
-                                 cloudip=serializer.validated_data['cloudip'])
+    datafrom = json.loads(request.GET.get('datafrom'))
+    serializer = CloudSerializer(data=datafrom)
+    if datafrom:
+            Cloud.objects.create(cloudname=datafrom['cloudname'], cloudip=datafrom['cloudip'])
             return JsonResponse({'code': "200"}, status=200)
 
     else:
         return JsonResponse({"code": "-1", "message": serializer.errors}, status=500)
+
+
+@api_view(['POST'])
+def cloud_test(request):
+    return JsonResponse({'code': "200", 'message': "connected success"}, status=200)
+
 
 
 def cloud_delete(request, cloudip):
@@ -52,22 +55,27 @@ def cloud_delete(request, cloudip):
             res = {"code": "-1", "message": "object not found"}
             return JsonResponse(res, status=200)
     else:
-        res = {"code": "-1", "message": "method not supported"}
+        res = {"code": "-1", "message": "method2 not supported"}
         return JsonResponse(res, status=200)
+
 
 @api_view(['POST'])
 def datanode_add(request):
-    logger.info(request.body)
-    serializer = DatanodeSerializer(data=request.data)
+    datafrom = json.loads(request.GET.get('datafrom'))
+    serializer = DatanodeSerializer(data=datafrom)
     if serializer.is_valid():
         try:
-            Cloud.objects.get(cloudip=cloudip)
+            cloudip = serializer.validated_data['cloudip']
+            logger.info(cloudip)
+            print(cloudip)
+            Cloud.objects.filter(cloudip=cloudip)
             dataunitip = serializer.validated_data['dataunitip']
             Datanode.objects.create(cloudip=cloudip, dataunitip=dataunitip)
-            return JsonResponse({'code': "200", "dataunitid": dataunitid}, status=200)
+            return JsonResponse({'code': "200"}, status=200)
         except Cloud.DoesNotExist:
-            return JsonResponse({"code": "-1", "message": "cloudid not found"}, status=500)
+            return JsonResponse({"code": "-1", "message": "cloudip not found"}, status=500)
     else:
+        print('test1')
         return JsonResponse({"code": "-1", "message": serializer.errors}, status=500)
 
 
@@ -91,31 +99,32 @@ def datanode_delete(request, cloudip, dataunitip):
 
 @api_view(['POST'])
 def alarm_add(request):
-    logger.info(request.body)
-    serializer = AlarmSerializer(data=request.data)
+    datafrom = json.loads(request.GET.get('datafrom'))
+    serializer = AlarmSerializer(data=datafrom)
     if serializer.is_valid():
         try:
+            cloudip = serializer.validated_data['cloudip']
             Cloud.objects.get(cloudip=cloudip)
             _uuid = uuid.uuid1()
             alarmid = str(_uuid).replace('-', '')
-            Alarm.objects.create(alarmid=alarmid, cloudip=cloudip, paramter=json.dumps(paramter))
+            Alarm.objects.create(alarmid=alarmid, cloudip=cloudip, paramter=json.dumps(datafrom))
             return JsonResponse({'code': "200", "alarmid": alarmid}, status=200)
         except Cloud.DoesNotExist:
-            return JsonResponse({"code": "-1", "message": "cloudid not found"}, status=200)
-    return JsonResponse({"code": "-1", "message": serializer.errors}, status=200)
+            return JsonResponse({"code": "-1", "message": "cloudid not found"}, status=500)
+    return JsonResponse({"code": "-1", "message": serializer.errors}, status=500)
 
 
 @api_view(['POST'])
 def alarm_recover(request):
-    serializer = RecoverSerializer(data=request.data)
+    datafrom = json.loads(request.GET.get('datafrom'))
+    serializer = RecoverSerializer(data=datafrom)
     if serializer.is_valid():
         alarmid = serializer.validated_data['alarmid']
-        describe = serializer.validated_data['describe']
         try:
             alarm = Alarm.objects.get(alarmid=alarmid)
-            alarm.describe = json.dumps(describe)
+            alarm.describe = json.dumps(datafrom)
             alarm.save()
             return JsonResponse({'code': "200"}, status=200)
         except Alarm.DoesNotExist:
-            return JsonResponse({"code": "-1", "message": "alarmid not found"}, status=400)
+            return JsonResponse({"code": "-1", "message": "alarmid not found"}, status=200)
     return JsonResponse({"code": "-1", "message": serializer.errors}, status=400)

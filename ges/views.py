@@ -225,7 +225,7 @@ def alarm_add(request):
                 alarmtype = paramter['alarmtype']
                 message = paramter['message']
                 stringtosing = 'POST&UserKeyID={0}&Time={1}&Version={2}&cloudid={3}&time={4}&type={5}&' \
-                               'disktype={6}&position={7}&dataunitid={8}&alarmtype={9}&message={10}'.format(
+                               'disktype={6}&position={7}&dataunitid={8}&message={10}&alarmtype={9}'.format(
                     userkeyid, time, version, cloudid, a_time, type, disktype, position, dataunitid, alarmtype, message)
             elif type == '3':
                 dataunitid = paramter['dataunitid']

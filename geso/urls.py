@@ -5,8 +5,9 @@ from . import views
 
 urlpatterns = [
     path('cloud/add', views.cloud_add, name='cloud_add'),
-    path('cloud/alarm', views.alarm_add, name='alarm_add'),
+    path('cloud/testconnect', views.cloud_test, name='cloud_testconnect'),
     path('cloud/recover', views.alarm_recover, name='alarm_recover'),
+    path('cloud/alarm', views.alarm_add, name='alarm_add'),
     path('cloud/<str:cloudip>', views.cloud_delete, name='cloud_delete'),
     path('cloud/getdataunitnum/<str:manufacturer>', views.getdataunitnum, name='getdataunitnum'),
     path('dataunit/add', views.datanode_add, name='datanode_add'),

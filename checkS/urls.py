@@ -19,5 +19,6 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('cloudapi/', include('ges.urls')),
-    path('cloudapiold/', include('geso.urls'))
+    # path('cloudapi-old/', include('geso.urls'))
+    path('rest/', include('geso.urls'))
 ]

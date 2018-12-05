@@ -145,6 +145,11 @@ logging.config.dictConfig({
             'level': 'INFO',
             'handlers': ['gfile'],
             'propagate': False
+        },
+        'geso': {
+            'level': 'INFO',
+            'handlers': ['gfile'],
+            'propagate': False
         }
     }
 })

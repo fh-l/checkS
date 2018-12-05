@@ -15,7 +15,7 @@ class CloudSerializer(serializers.Serializer):
     password = serializers.CharField(required=True)
     cloudname = serializers.CharField(required=True)
     metadatatype = serializers.CharField(required=True)
-    # metadataip = serializers.CharField(required=True)
+    metadataip = serializers.CharField(required=True)
     baseurl = serializers.CharField(required=True)
     area_code = serializers.CharField(required=True)
     protocol = serializers.CharField(required=True)
